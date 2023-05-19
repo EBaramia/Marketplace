@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}{% endblock %} | Market</title>
   </head>
   <body>
     <nav class="border-b border-gray-300">
@@ -11,7 +12,9 @@
         class="max-w-6xl mx-auto py-2 px-6 xl:px-0 flex item-center justify-between"
       >
         <div class="menu-left flex item-center space-x-6">
-          <a href="#" class="py-4 text-lg text-purple-500 font-semibold"
+          <a
+            href="{% url 'frontpage' %}"
+            class="py-4 text-lg text-purple-500 font-semibold"
             >Market Place</a
           >
           <ul class="flex items-center space-x-4">
@@ -23,7 +26,7 @@
           </ul>
         </div>
         <div class="menu-right flex items-center space-x-4">
-          <a href="#">
+          <a href="{% url 'login' %}">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
