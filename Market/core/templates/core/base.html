@@ -42,6 +42,11 @@
               />
             </svg>
           </a>
+          <div
+            hx-get="{% url 'hx_menu_cart' %}"
+            hx-trigger="update-menu-card from:body"
+            hx-swap="innerHTML"
+          ></div>
           {% include 'cart/menu_cart.html' %}
         </div>
       </div>
