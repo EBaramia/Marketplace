@@ -1,7 +1,8 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .cart import Cart
 from product.models import Product
+from .cart import Cart
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.conf import settings
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
@@ -19,18 +20,23 @@ def update_cart(request, product_id, action):
     else:
         cart.add(product_id, -1, True)
     product = Product.objects.get(pk=product_id)
-    quantity = cart.get_item(product_id)['quantity']
-    item = {
-        'product':{
-            'id':product.id,
-            'name':product.name,
-            'image':product.image,
-            'get_thumbnail':product.get_thumbnail(),
-            'price': product.price
-        },
-        'total_price':(quantity * product.price),
-        'quantity':quantity,
-    }
+    quantity = cart.get_item(product_id)
+    if quantity:
+        quantity = quantity['quantity']
+        item = {
+            'product':{
+                'id':product.id,
+                'name':product.name,
+                'image':product.image,
+                'get_thumbnail':product.get_thumbnail(),
+                'price': product.price
+            },
+            'total_price':(quantity * product.price),
+            'quantity':quantity,
+        }
+    else:
+        item=None
+
     response = render(request, 'card/partials/cart_item.html', {'item':item})
     response['HX-Trigger'] = 'update-menu-cart'
 
@@ -38,7 +44,8 @@ def update_cart(request, product_id, action):
 
 @login_required
 def chackout(request):
-    return render(request, 'cart/checkout.html')
+    pub_key = settings.STRIPE_API_KEY_PUBLISHABLE
+    return render(request, 'cart/checkout.html', {'pub_key':pub_key})
 
 def hx_menu_cart(request):
     return render(request, 'cart/menu_cart.html')

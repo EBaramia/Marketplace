@@ -1,5 +1,5 @@
-from django.conf import settings
 from product.models import Product
+from django.conf import settings
 
 class Cart(object):
     def __init__(self, request):
@@ -50,4 +50,7 @@ class Cart(object):
         return sum(item['total_price'].price * item['quantity'] for item in self.cart.values())
     
     def get_item(self, product_id):
-        return self.cart[str(product_id)]
+        if str(product_id) in self.cart:
+            return self.cart[str(product_id)]
+        else:
+            return None
