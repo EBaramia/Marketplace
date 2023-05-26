@@ -1,12 +1,14 @@
+from django.contrib.auth.models import User
+from django.core.files import File
+from io import BytesIO
 from django.db import models
 from PIL import Image
-from io import BytesIO
-from django.core.files import File
 
 
 class Category(models.Model):
     class Meta:
         ordering = ('name', )
+        verbose_name_plural = 'Categories'
 
     name = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -59,3 +61,21 @@ class Product(models.Model):
         thumbnail = File(thumb_io, name=image.name)
 
         return thumbnail
+    
+    def get_rating(self):
+        reviews_total = 0
+
+        for review in self.reviews.all():
+            reviews_total += review.rating
+
+        if reviews_total > 0:
+            return reviews_total / self.reviews.count()
+        
+        return 0
+
+class Review(models.Model):
+    pruduct = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    rating = models.IntegerField(default=3)
+    content = models.TextField()
+    created_by = models.ForeignKey(User, related_name='reviews', on_delete=models.CASCADE)
+    created_at = models.DateField(auto_now_add=True)

@@ -1,7 +1,6 @@
 from .models import Order, OrderItem
 from django.http import JsonResponse
 from cart.cart import Cart
-from django.shortcuts import redirect
 from django.conf import settings
 import json
 import stripe
@@ -17,7 +16,8 @@ def start_order(request):
     for item in cart():
         product = item['product']
         total_price += product.price * int(item['product'])
-        obj = {
+
+        items.append({
             'price_date': {
                 'currency':'usd',
                 'product_data': {
@@ -26,8 +26,7 @@ def start_order(request):
                 'unit_amount': product.price,
             },
             'quantity': item['quantity']
-        }
-        items.append(obj)
+        })
 
     payment_intent = ''
 
@@ -41,19 +40,19 @@ def start_order(request):
     )
     payment_intent = session.payment_intent
 
-    first_name = data['first_name'] 
-    last_name = data['last_name']
-    email = data['email']
-    address = data['address'] 
-    zipcode = data['zipcode']
-    place = data['place']
-    phone = data['phone']  
-
-    order = Order.objects.create(user=request.user, first_name=first_name, last_name=last_name, email=email, phone=phone, address=address, zipcode=zipcode, place=place)
-    order.paymant_intent = payment_intent
-    order.paid_amount = total_price
-    order.paid = True
-    order.save()
+    order = Order.objects.create(
+        user=request.user, 
+        first_name=data['first_name'] , 
+        last_name=data['last_name'], 
+        email=data['email'], 
+        phone=data['phone'], 
+        address=data['address'], 
+        zipcode=data['zipcode'], 
+        place=data['place'],
+        payment_intent=payment_intent,
+        paid=True,
+        paid_amount=total_price
+    )
        
     for item in cart():
         product = item['product']
@@ -61,4 +60,6 @@ def start_order(request):
         price = product.price * quantity
         item = OrderItem.objects.create(order=order, product=product, price=price, quantity=quantity)
     
+    cart.clear()
+
     return JsonResponse({'session':session, 'order': payment_intent}) 

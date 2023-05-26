@@ -30,7 +30,7 @@
         <div class="w-3/4 pl-6">
           <div class="flex justify-between">
             <a href="#" class="flex-lg">{{ item.product.name}}</a>
-            <p class="mb-6 pt-1 text-gray-400">$9.99</p>
+            <p class="mb-6 pt-1 text-gray-400">${{ item.get_totol_price }}</p>
           </div>
           <hr />
           <div class="mt-6">Quantity: {{ item.quantity }}</div>
@@ -40,7 +40,7 @@
     </div>
     <div>
       <p class="text-lg">Date: {{ order.created_at }}</p>
-      <p class="text-lg">Total: $100</p>
+      <p class="text-lg">Total: ${{ get_totol_price }}</p>
     </div>
   </div>
   {% endfor %}
